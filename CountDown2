@@ -1,0 +1,71 @@
+using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
+public class CountDown2 : MonoBehaviour
+{
+    public float totalTime = 60f; // Total time for the countdown
+    private float timeRemaining; // Time remaining for the countdown
+    public TMP_Text countdownText; // Reference to the TextMeshPro UI Text element
+    public Color normalColor = Color.white; // Normal color of the text
+    public Color warningColor = Color.red; // Color when the timer hits the warning threshold
+    public float warningThreshold = 10f; // Time remaining when the warning color starts
+
+    private bool isBlinking = false;
+
+    void Start()
+    {
+        timeRemaining = totalTime;
+        countdownText.color = normalColor; // Set initial color to normal color
+    }
+
+    void Update()
+    {
+        // Update the time remaining
+        timeRemaining -= Time.deltaTime;
+
+        // Update the TextMeshPro UI Text with the current time remaining
+        countdownText.text = "Time: " + Mathf.RoundToInt(timeRemaining).ToString();
+
+        // Check if the timer has reached zero
+        if (timeRemaining <= 0)
+        {
+            // Restart the level
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        // Check if the timer is below the warning threshold
+        if (timeRemaining <= warningThreshold)
+        {
+            // Start blinking the text red
+            if (!isBlinking)
+            {
+                isBlinking = true;
+                StartCoroutine(BlinkText());
+            }
+        }
+        else
+        {
+            // Set text color to normal color
+            countdownText.color = normalColor;
+            isBlinking = false;
+        }
+    }
+
+    IEnumerator BlinkText()
+    {
+        while (true)
+        {
+            // Set text color to warning color
+            countdownText.color = warningColor;
+
+            yield return new WaitForSeconds(0.5f);
+
+            // Set text color to normal color
+            countdownText.color = normalColor;
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+}
